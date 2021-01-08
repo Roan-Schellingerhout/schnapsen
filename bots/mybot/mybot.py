@@ -77,9 +77,11 @@ class Bot:
                 else:
                     return (min([card for card in state.hand() if suits[card // 5] != trump_suit], key = lambda x: x // 5), None)
         
-        # in phase 2, do other shit.     
         else:
-            # start by playing high trumps, then move on to high non-trumps
-
+            if not opcard:
+                if trump_moves:
+                    return (max(trump_moves), None)
+                else:
+                    return (max(moves, key = lambda x: x[0] % 5))
             # Return a random choice
             return random.choice(moves)
