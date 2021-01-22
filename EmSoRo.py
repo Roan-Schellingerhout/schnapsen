@@ -21,6 +21,7 @@ import joblib
 import pandas as pd
 
 from bots.rand import rand
+from bots.rdeep import rdeep
 from bots.project import project
 from bots.project.project import features
 
@@ -122,7 +123,7 @@ parser.add_argument("--no-train",
 options = parser.parse_args()
 
 if options.overwrite or not os.path.isfile(options.dset_path):
-    create_dataset(options.dset_path, player=rand.Bot(), games=1000)
+    create_dataset(options.dset_path, player=rdeep.Bot(), games=1000)
 
 if options.train:
 
@@ -159,4 +160,5 @@ if options.train:
 
                 measures["Recall"].append(sklearn.metrics.recall_score(y_test, learner.predict(X_test_scaled), pos_label="won"))
 
+    print(measures, "\n\n")
     print(pd.DataFrame(measures))
