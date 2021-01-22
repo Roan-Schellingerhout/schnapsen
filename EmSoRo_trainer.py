@@ -124,7 +124,7 @@ parser.add_argument("--no-train",
 options = parser.parse_args()
 
 if options.overwrite or not os.path.isfile(options.dset_path):
-    create_dataset(options.dset_path, player=rand.Bot(), games=2500)
+    create_dataset(options.dset_path, player=rdeep.Bot(), games=10000)
 
 if options.train:
 
@@ -132,14 +132,12 @@ if options.train:
 
     # HINT: Use tournament fast mode (-f flag) to quickly test your different models.
 
-    start = time.time()
-
     print("Starting training phase...")
 
     with open(options.dset_path, 'rb') as output:
         data, target = pickle.load(output)
 
-    learner = SVC(kernel="rbf", C=10, probability=True, verbose=True, shrinking=0)
+    learner = SVC(kernel="rbf", C=10, verbose=True, shrinking=0)
 
     print("Started fitting at: ", time.time())
     model = learner.fit(data, target)
