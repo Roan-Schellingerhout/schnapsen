@@ -12,7 +12,7 @@ import joblib
 
 # Path of the model we will use. If you make a model
 # with a different name, point this line to its path.
-DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10_rdeep_2500.pkl'
+DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10_rdeep_10000_noproba.pkl'
 
 #rbf_10_rdeep_2500 seems very strong
 #rbf_10_rand_2500 also works fine
@@ -77,17 +77,11 @@ class Bot:
         # Convert the state to a feature vector
         feature_vector = [features(state)]
 
-        # These are the classes: ('won', 'lost')
-        classes = list(self.__model.classes_)
-
         # Ask the model for a prediction
-        # This returns a probability for each class
-        prob = self.__model.predict_proba(feature_vector)[0]
-
-        # Weigh the win/loss outcomes (-1 and 1) by their probabilities
-        res = -1.0 * prob[classes.index('lost')] + 1.0 * prob[classes.index('won')]
-
-        return res
+        # This returns how likely a win (positive number) or loss (negative number) is
+        prob = self.__model.decision_function(feature_vector)[0]
+        
+        return prob
 
 def maximizing(state):
     """
