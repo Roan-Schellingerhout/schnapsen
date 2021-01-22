@@ -12,10 +12,10 @@ import joblib
 
 # Path of the model we will use. If you make a model
 # with a different name, point this line to its path.
-DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10_rand_2500.pkl'
+DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10_rdeep_2500.pkl'
 
-#rbf_10_rdeep_2500 is cracked
-#rbf_10_rand_2500 ook prima
+#rbf_10_rdeep_2500 seems very strong
+#rbf_10_rand_2500 also works fine
 
 class Bot:
 

@@ -21,10 +21,12 @@ import joblib
 import pandas as pd
 
 from bots.rand import rand
+from bots.rdeep import rdeep
+
 from bots.project import project
 from bots.project.project import features
 
-def create_dataset(path, player=rand.Bot(), games=10, phase=1):
+def create_dataset(path, player=rdeep.Bot(), games=10, phase=1):
     """Create a dataset that can be used for training the ML bot model.
     The dataset is created by having the player (bot) play games against itself.
     The games parameter indicates how many games will be started.
@@ -122,7 +124,7 @@ parser.add_argument("--no-train",
 options = parser.parse_args()
 
 if options.overwrite or not os.path.isfile(options.dset_path):
-    create_dataset(options.dset_path, player=rand.Bot(), games=1000)
+    create_dataset(options.dset_path, player=rand.Bot(), games=2500)
 
 if options.train:
 
@@ -137,10 +139,9 @@ if options.train:
     with open(options.dset_path, 'rb') as output:
         data, target = pickle.load(output)
 
-    learner = SVC(kernel="rbf", C=10, random_state=0, probability=True)
+    learner = SVC(kernel="rbf", C=10, probability=True, verbose=True, shrinking=0)
 
-    print("Done learning!")
-
+    print("Started fitting at: ", time.time())
     model = learner.fit(data, target)
 
     print("Done fitting!")
