@@ -4,7 +4,7 @@ A basic adaptive bot. This is part of the third worksheet.
 
 """
 
-from api import State, util
+from api import State, util, Deck
 import random, os
 from itertools import chain
 
@@ -12,7 +12,10 @@ import joblib
 
 # Path of the model we will use. If you make a model
 # with a different name, point this line to its path.
-DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10.pkl'
+DEFAULT_MODEL = os.path.dirname(os.path.realpath(__file__)) + '/rbf_10_rand_2500.pkl'
+
+#rbf_10_rdeep_2500 is cracked
+#rbf_10_rand_2500 ook prima
 
 class Bot:
 
@@ -139,13 +142,21 @@ def features(state):
     # Add opponent's played card to feature set
     opponents_played_card = state.get_opponents_played_card()
 
-
-    # Possible additional features:
+    # square points
     squared_points = state.get_points(p1) ** 2
 
+    # the current points and pending points multiplied
     current_and_pending_points = state.get_points(p1) * state.get_pending_points(p1)
 
+    # The difference in points between us and the opponent
     current_lead = state.get_points(p1) - state.get_points(p2)
+
+    # The current value of our hand in points
+    points = {"J" : 2, "Q" : 3, "K" : 4, "10" : 10, "A" : 11}
+    hand_value = sum([points[Deck.get_rank(card)] for card in Deck.get_player_hand(state, p1)])
+
+    # number of trump cards we have
+    number_of_trumps = len([card for card in Deck.get_player_hand(state, p1) if Deck.get_suit(card) == trump_suit])
 
     ################## You do not need to do anything below this line ########################
 
@@ -197,7 +208,7 @@ def features(state):
     opponents_played_card_onehot[opponents_played_card if opponents_played_card is not None else 20] = 1
     feature_set += opponents_played_card_onehot
 
-    feature_set += [squared_points, current_and_pending_points, current_lead]
+    feature_set += [squared_points, current_and_pending_points, current_lead, hand_value, number_of_trumps]
 
     # Return feature set
     return feature_set
