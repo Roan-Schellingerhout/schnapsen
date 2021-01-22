@@ -132,8 +132,6 @@ if options.train:
 
     # HINT: Use tournament fast mode (-f flag) to quickly test your different models.
 
-    start = time.time()
-
     print("Starting training phase...")
 
     with open(options.dset_path, 'rb') as output:
