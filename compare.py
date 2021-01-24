@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
 from api import State, util, engine
 import random, time
-from kb_ml import kb_ml
-from ml_kb import ml_kb
-from project import project
-from kbbot import kbbot
+from bots.kb_ml import kb_ml
+from bots.ml_kb import ml_kb
+from bots.project import project
+from bots.kbbot import kbbot
 
 def run_tournament(options):
 
