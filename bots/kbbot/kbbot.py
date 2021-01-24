@@ -3,7 +3,6 @@ import random
 from . import load
 from .kb import KB, Boolean, Integer
 
-
 class Bot:
 
     def __init__(self):

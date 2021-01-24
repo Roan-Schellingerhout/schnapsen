@@ -10,7 +10,7 @@ from load.py.
 
 from api import State, util, Deck
 import random
-from . import load
+from . import load_milestone as load
 from .kb import KB, Boolean, Integer
 
 class Bot:

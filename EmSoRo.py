@@ -22,11 +22,10 @@ import pandas as pd
 
 from bots.rand import rand
 from bots.rdeep import rdeep
-
 from bots.project import project
 from bots.project.project import features
 
-def create_dataset(path, player=rdeep.Bot(), games=10, phase=1):
+def create_dataset(path, player=rand.Bot(), games=10, phase=1):
     """Create a dataset that can be used for training the ML bot model.
     The dataset is created by having the player (bot) play games against itself.
     The games parameter indicates how many games will be started.
@@ -75,7 +74,7 @@ def create_dataset(path, player=rdeep.Bot(), games=10, phase=1):
             move = player.get_move(given_state)
             state = state.next(move)
 
-        winner, _ = state.winner()
+        winner, score = state.winner()
 
         for state_vector in state_vectors:
             data.append(state_vector)
@@ -124,38 +123,42 @@ parser.add_argument("--no-train",
 options = parser.parse_args()
 
 if options.overwrite or not os.path.isfile(options.dset_path):
-    create_dataset(options.dset_path, player=rdeep.Bot(), games=10000)
+    create_dataset(options.dset_path, player=rdeep.Bot(), games=1000)
 
 if options.train:
-
-    # Play around with the model parameters below
-
-    # HINT: Use tournament fast mode (-f flag) to quickly test your different models.
-
-    print("Starting training phase...")
-    start = time.time()
 
     with open(options.dset_path, 'rb') as output:
         data, target = pickle.load(output)
 
-    learner = SVC(kernel="rbf", C=10, verbose=True, shrinking=0)
+    # Train/test split
+    df = pd.DataFrame(data)
+    
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(df.values, target, test_size = 0.2)
 
-    model = learner.fit(data, target)
+    minmax = sklearn.preprocessing.MinMaxScaler().fit(X_train)
+    X_train_scaled = minmax.transform(X_train)
+    X_test_scaled = minmax.transform(X_test)
 
-    print("Done fitting!")
+    measures = {"Kernel":[], "C":[], "Accuracy":[], "Precision":[],"Recall":[]}
 
-    # Check for class imbalance
-    count = {}
-    for t in target:
-        if t not in count:
-            count[t] = 0
-        count[t] += 1
+    # Train a neural network
+    for kernel in ["rbf", "sigmoid", "poly", "linear"]:
+        print(f"Testing {kernel}")
+        for C in [0.1, 1, 10, 100]:
+            if kernel != "linear" or C < 1:
+                print(f"    C = {C}")
+                learner = SVC(kernel=kernel, C=C, random_state=0, probability=True).fit(X_train_scaled, y_train)
+                y_pred = learner.predict(X_test_scaled)
 
-    print('instances per class: {}'.format(count))
+                measures["C"].append(C)
 
-    # Store the model in the ml directory
-    joblib.dump(model, "./bots/ml/" + options.model_path)
+                measures["Kernel"].append(kernel)
 
-    end = time.time()
+                measures["Accuracy"].append(sklearn.metrics.accuracy_score(y_test, learner.predict(X_test_scaled)))
 
-    print('Done. Time to train:', (end-start)/60, 'minutes.')
+                measures["Precision"].append(sklearn.metrics.precision_score(y_test, learner.predict(X_test_scaled), pos_label="won"))
+
+                measures["Recall"].append(sklearn.metrics.recall_score(y_test, learner.predict(X_test_scaled), pos_label="won"))
+
+    print(measures, "\n\n")
+    print(pd.DataFrame(measures))
