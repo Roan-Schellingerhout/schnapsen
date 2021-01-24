@@ -107,10 +107,12 @@ class Bot:
                             if not self.cheap_consistent(state, move):
                                 #print("Play J || Q || K")
                                 return move
-                            elif not self.ten_consistent(state, move):
+                        for move in moves:
+                            if not self.ten_consistent(state, move):
                                 #print("Play 10")
                                 return move
-                            elif not self.ace_consistent(state, move):
+                        for move in moves:
+                            if not self.ace_consistent(state, move):
                                 #print("Play A")
                                 return move
                             else:
