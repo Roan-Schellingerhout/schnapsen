@@ -123,7 +123,7 @@ parser.add_argument("--no-train",
 options = parser.parse_args()
 
 if options.overwrite or not os.path.isfile(options.dset_path):
-    create_dataset(options.dset_path, player=rdeep.Bot(), games=1000)
+    create_dataset(options.dset_path, player=rdeep.Bot(), games=2000)
 
 if options.train:
 
@@ -147,7 +147,7 @@ if options.train:
         for C in [0.1, 1, 10, 100]:
             if kernel != "linear" or C < 1:
                 print(f"    C = {C}")
-                learner = SVC(kernel=kernel, C=C, random_state=0, probability=True).fit(X_train_scaled, y_train)
+                learner = SVC(kernel=kernel, C=C, random_state=0).fit(X_train_scaled, y_train)
                 y_pred = learner.predict(X_test_scaled)
 
                 measures["C"].append(C)

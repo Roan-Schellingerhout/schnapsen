@@ -25,7 +25,6 @@ class Bot:
 
     def __init__(self, randomize=True, model_file=DEFAULT_MODEL):
 
-        print(model_file)
         self.__randomize = randomize
 
         # Load the model

@@ -19,9 +19,8 @@ from sklearn.neural_network import MLPClassifier
 import joblib
 
 from bots.rand import rand
-# from bots.rdeep import rdeep
 
-from bots.ml.ml import features
+from bots.week4.question_4_1 import features
 
 def create_dataset(path, player=rand.Bot(), games=2000, phase=1):
     """Create a dataset that can be used for training the ML bot model.
