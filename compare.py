@@ -5,43 +5,28 @@ from bots.kb_ml import kb_ml
 from bots.ml_kb import ml_kb
 from bots.project import project
 from bots.kbbot import kbbot
+from bots.rand import rand
+from collections import defaultdict
+import pandas as pd
+from tqdm import tqdm
 
-def run_tournament(options):
+if __name__ == "__main__":
+    bots = [("kb_ml", kb_ml.Bot()), ("ml_kb", ml_kb.Bot()), ("ml", project.Bot()), ("kb", kbbot.Bot())]
 
-    botnames = options.players.split(",")
+    results = defaultdict(list)
 
-    bots = []
-    for botname in botnames:
-        bots.append(util.load_player(botname))
+    for bot in bots:
+        print(f"Current bot: {bot[0]}")
+        for tour in tqdm(range(500)):
+            t_score = [0, 0]
+            for r in range(10):
+                state = State.generate()
+                winner, score = engine.play(bot[1], rand.Bot(), state, verbose=False, fast=True)
+                t_score[winner - 1] += score
+            results[bot[0]].append(tuple(t_score))
 
-    n = len(bots)
-    wins = [0] * len(bots)
-    matches = [(p1, p2) for p1 in range(n) for p2 in range(n) if p1 < p2]
+    df = pd.DataFrame(results)
 
-    totalgames = (n*n - n)/2 * options.repeats
-    playedgames = 0
+    print(df)
 
-    print('Playing {} games:'.format(int(totalgames)))
-    for a, b in matches:
-        for r in range(options.repeats):
-
-            if random.choice([True, False]):
-                p = [a, b]
-            else:
-                p = [b, a]
-
-            # Generate a state with a random seed
-            state = State.generate(phase=int(options.phase))
-
-            winner, score = engine.play(bots[p[0]], bots[p[1]], state, options.max_time*1000, verbose=options.verbose, fast=options.fast)
-
-            if winner is not None:
-                winner = p[winner - 1]
-                wins[winner] += score
-
-            playedgames += 1
-            print('Played {} out of {:.0f} games ({:.0f}%): {} \r'.format(playedgames, totalgames, playedgames/float(totalgames) * 100, wins))
-
-    print('Results:')
-    for i in range(len(bots)):
-        print('    bot {}: {} points'.format(bots[i], wins[i]))
+    df.to_csv("results_slow.csv")
